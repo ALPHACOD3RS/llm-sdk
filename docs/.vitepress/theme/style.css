@@ -1,0 +1,1085 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root {
+  --llm-black: #030303;
+  --llm-ink: #070707;
+  --llm-line: rgb(255 255 255 / 0.12);
+  --llm-line-soft: rgb(255 255 255 / 0.08);
+  --llm-fg: #f4f4f4;
+  --llm-muted: rgb(255 255 255 / 0.5);
+  --llm-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --llm-mono: "IBM Plex Mono", ui-monospace, monospace;
+  /* Width of the docs index gutter: section numbers live here, left of the content rail. */
+  --llm-gutter: 3.25rem;
+}
+
+html.dark,
+html:not(.light) {
+  color-scheme: dark;
+}
+
+.llm-home {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--llm-black);
+  color: var(--llm-fg);
+  font-family: var(--llm-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+.llm-home::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.llm-home * {
+  box-sizing: border-box;
+}
+
+.llm-home a:not(.llm-btn) {
+  color: inherit;
+  text-decoration: none;
+}
+
+.llm-home a.llm-btn {
+  text-decoration: none;
+}
+
+.llm-full-rule {
+  position: relative;
+}
+
+.llm-full-rule::before,
+.llm-full-rule::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--llm-line);
+  pointer-events: none;
+  z-index: 40;
+}
+
+.llm-full-rule::before {
+  top: 0;
+}
+
+.llm-full-rule::after {
+  bottom: 0;
+}
+
+.llm-top-rule {
+  border-top: 1px solid var(--llm-line);
+}
+
+.llm-mono {
+  font-family: var(--llm-mono);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.llm-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.llm-corner--tl {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid rgb(255 255 255 / 0.4);
+  border-left: 1px solid rgb(255 255 255 / 0.4);
+}
+
+.llm-corner--tr {
+  top: -1px;
+  right: -1px;
+  border-top: 1px solid rgb(255 255 255 / 0.4);
+  border-right: 1px solid rgb(255 255 255 / 0.4);
+}
+
+.llm-corner--bl {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.4);
+  border-left: 1px solid rgb(255 255 255 / 0.4);
+}
+
+.llm-corner--br {
+  right: -1px;
+  bottom: -1px;
+  border-right: 1px solid rgb(255 255 255 / 0.4);
+  border-bottom: 1px solid rgb(255 255 255 / 0.4);
+}
+
+.llm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.35rem;
+  padding: 0 1.05rem;
+  border: 1px solid transparent;
+  background: #fff;
+  color: #000;
+  font-family: var(--llm-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition:
+    background 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.llm-btn:hover {
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35);
+}
+
+.llm-btn:active {
+  transform: translateY(1px);
+}
+
+.llm-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.llm-btn--ghost {
+  background: transparent;
+  color: rgb(255 255 255 / 0.78);
+  border-color: rgb(255 255 255 / 0.18);
+}
+
+.llm-btn--ghost:hover {
+  background: rgb(255 255 255 / 0.05);
+  color: #fff;
+  box-shadow: none;
+}
+
+.llm-hero-flicker {
+  mask-image: linear-gradient(to top, black 8%, transparent 88%);
+  -webkit-mask-image: linear-gradient(to top, black 8%, transparent 88%);
+}
+
+.llm-feature-spotlight {
+  background:
+    radial-gradient(ellipse 80% 70% at 92% 100%, rgb(255 255 255 / 0.07), transparent 55%),
+    linear-gradient(to top, rgb(255 255 255 / 0.025), transparent 45%);
+}
+
+.llm-logo-viewport:hover .llm-logo-rail,
+.llm-logo-viewport:focus-within .llm-logo-rail {
+  animation-play-state: paused;
+}
+
+.llm-logo-rail {
+  animation: llm-marquee var(--llm-logo-duration, 32s) linear infinite;
+}
+
+@keyframes llm-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes llm-strike {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes llm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .llm-logo-rail {
+    animation: none !important;
+  }
+}
+
+html.dark {
+  --vp-c-bg: #030303;
+  --vp-c-bg-alt: #070707;
+  --vp-c-bg-soft: #101010;
+  --vp-c-border: rgb(255 255 255 / 0.12);
+  --vp-c-divider: rgb(255 255 255 / 0.1);
+  --vp-c-text-1: #f2f2f2;
+  --vp-c-text-2: rgb(255 255 255 / 0.62);
+  --vp-font-family-base: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --vp-font-family-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Every semantic accent (brand/tip/important/warning/danger/caution/default) collapses to
+     the same monochrome palette as the landing page — severity reads via intensity/border
+     weight below, not hue. */
+  --vp-c-brand-1: #eaeaea;
+  --vp-c-brand-2: #fff;
+  --vp-c-brand-3: #ccc;
+  --vp-c-brand-soft: rgb(255 255 255 / 0.08);
+
+  --vp-c-default-1: rgb(255 255 255 / 0.7);
+  --vp-c-default-2: rgb(255 255 255 / 0.55);
+  --vp-c-default-3: rgb(255 255 255 / 0.4);
+  --vp-c-default-soft: rgb(255 255 255 / 0.06);
+
+  --vp-c-tip-1: var(--vp-c-brand-1);
+  --vp-c-tip-2: var(--vp-c-brand-2);
+  --vp-c-tip-3: var(--vp-c-brand-3);
+  --vp-c-tip-soft: var(--vp-c-brand-soft);
+
+  --vp-c-important-1: #eaeaea;
+  --vp-c-important-2: #fff;
+  --vp-c-important-3: #ccc;
+  --vp-c-important-soft: rgb(255 255 255 / 0.08);
+
+  --vp-c-warning-1: #f2f2f2;
+  --vp-c-warning-2: #fff;
+  --vp-c-warning-3: #ddd;
+  --vp-c-warning-soft: rgb(255 255 255 / 0.1);
+
+  --vp-c-danger-1: #fff;
+  --vp-c-danger-2: #fff;
+  --vp-c-danger-3: #eee;
+  --vp-c-danger-soft: rgb(255 255 255 / 0.14);
+
+  --vp-c-caution-1: var(--vp-c-danger-1);
+  --vp-c-caution-2: var(--vp-c-danger-2);
+  --vp-c-caution-3: var(--vp-c-danger-3);
+  --vp-c-caution-soft: var(--vp-c-danger-soft);
+
+  /* Severity now reads as left-border weight/brightness instead of hue. */
+  --vp-custom-block-info-border: rgb(255 255 255 / 0.16);
+  --vp-custom-block-tip-border: rgb(255 255 255 / 0.28);
+  --vp-custom-block-important-border: rgb(255 255 255 / 0.28);
+  --vp-custom-block-warning-border: rgb(255 255 255 / 0.5);
+  --vp-custom-block-danger-border: #fff;
+  --vp-custom-block-caution-border: #fff;
+}
+
+/* =========================================================================
+   Docs chrome — Farm.js-inspired restyle of VitePress's default theme:
+   mono indexed labels, hairline borders, flat panels. See docs/index.md
+   (Landing.vue) for the same visual language on the marketing page.
+   ========================================================================= */
+
+/* Sharp corners everywhere in the docs chrome — matches the landing page, which has none. */
+.VPNav,
+.VPNav *,
+.VPSidebar,
+.VPSidebar *,
+.VPContent,
+.VPContent *,
+.doc-toolbar,
+.doc-toolbar * {
+  border-radius: 0 !important;
+}
+
+/* ---- top nav ---- */
+.VPNav {
+  background: rgb(3 3 3 / 0.92);
+  backdrop-filter: blur(18px);
+  /* box-shadow, not border-bottom: .VPNav is the fixed, z-index:30 wrapper — a shadow painted
+     here is guaranteed to sit above the sidebar (z-index:25) and the page content beneath it.
+     A border-bottom on .VPNavBar (z-index:auto, position:relative) doesn't have that guarantee,
+     and at only 12% opacity it read as invisible against the blurred backdrop in practice. */
+  box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.16);
+}
+
+.VPNavBar {
+  background: transparent !important;
+}
+
+.VPNavBar.has-sidebar .curtain,
+.VPNavBar .divider {
+  display: none;
+}
+
+.VPNavBarTitle .title {
+  gap: 0.6rem;
+  font-family: var(--llm-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.llm-nav-breadcrumb {
+  margin-left: 0.15rem;
+  font-family: var(--llm-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.34);
+}
+
+.VPNavBarMenu {
+  counter-reset: llm-nav-item;
+}
+
+.VPNavBarMenuLink {
+  position: relative;
+  gap: 0.4rem;
+  padding: 0 0.9rem !important;
+  font-family: var(--llm-mono);
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.5) !important;
+}
+
+.VPNavBarMenuLink::before {
+  counter-increment: llm-nav-item;
+  content: counter(llm-nav-item, decimal-leading-zero) "/";
+  color: rgb(255 255 255 / 0.24);
+}
+
+.VPNavBarMenuLink:hover,
+.VPNavBarMenuLink.active {
+  color: #fff !important;
+}
+
+.VPNavBarSearch .DocSearch-Button,
+.VPNavBarSearch .VPNavBarSearchButton {
+  border: 1px solid var(--llm-line) !important;
+  border-radius: 0 !important;
+  background: rgb(255 255 255 / 0.03) !important;
+  font-family: var(--llm-mono) !important;
+}
+
+.VPNavBarSearch .DocSearch-Button:hover {
+  border-color: rgb(255 255 255 / 0.28) !important;
+  background: rgb(255 255 255 / 0.06) !important;
+}
+
+.VPSocialLink {
+  color: rgb(255 255 255 / 0.5);
+}
+
+.VPSocialLink:hover {
+  color: #fff;
+}
+
+/* Base size for every `.nav-icon` (sidebar item icons, embedded via v-html from
+   sidebar-icons.ts) — set unconditionally so it's constrained anywhere VitePress reuses that
+   item's raw text HTML, e.g. the prev/next pager footer, not just inside the sidebar itself. */
+.nav-icon {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  vertical-align: -2px;
+}
+
+.pager-link .nav-icon {
+  display: none;
+}
+
+/* ---- sidebar ---- */
+.VPSidebar {
+  border-right: 1px solid var(--llm-line) !important;
+  background: var(--llm-black) !important;
+  padding-top: 32px !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-bottom: 3rem !important;
+}
+
+@media (min-width: 960px) {
+  .VPSidebar {
+    padding-top: calc(var(--vp-nav-height) + 1.25rem) !important;
+  }
+}
+
+.VPSidebarItem.level-0 + .VPSidebarItem.level-0 {
+  margin-top: 1.75rem;
+}
+
+.VPSidebarItem.level-0 > .item {
+  padding: 0.4rem 0.35rem 0.6rem;
+}
+
+.VPSidebarItem.level-0 > .item .text {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--llm-mono);
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.88) !important;
+}
+
+.VPSidebarItem.level-0 .nav-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.62;
+}
+
+/* Leaf items: full-row hover/active fill, no rail line — index + icon + label. */
+.VPSidebarItem.level-1 {
+  margin: 1px 0;
+}
+
+.VPSidebarItem.level-0 {
+  counter-reset: llm-doc-item;
+}
+
+.VPSidebarItem.level-1 .text::before {
+  counter-increment: llm-doc-item;
+  content: counter(llm-doc-item, decimal-leading-zero);
+  font-family: var(--llm-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: rgb(255 255 255 / 0.24);
+}
+
+.VPSidebarItem.level-1:hover .text::before,
+.VPSidebarItem.level-1.is-active .text::before {
+  color: rgb(255 255 255 / 0.5);
+}
+
+.VPSidebarItem.level-1 > .item {
+  padding: 0 0.35rem !important;
+  transition: background 120ms ease;
+}
+
+.VPSidebarItem.level-1:hover > .item {
+  background: rgb(255 255 255 / 0.045);
+}
+
+.VPSidebarItem.level-1.is-active > .item {
+  background: rgb(255 255 255 / 0.09);
+  box-shadow: inset 2px 0 0 #fff;
+}
+
+.VPSidebarItem.level-1 .link {
+  width: 100%;
+}
+
+.VPSidebarItem.level-1 .text {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.4rem;
+  font-size: 12.5px !important;
+  color: rgb(255 255 255 / 0.56) !important;
+  transition: color 120ms ease;
+}
+
+.VPSidebarItem.level-1:hover .text {
+  color: #fff !important;
+}
+
+.VPSidebarItem.level-1.is-active .text {
+  color: #fff !important;
+  font-weight: 500 !important;
+}
+
+.VPSidebarItem.level-1 .indicator {
+  display: none;
+}
+
+.VPSidebarItem.level-1 .nav-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 120ms ease;
+}
+
+.VPSidebarItem.level-1:hover .nav-icon,
+.VPSidebarItem.level-1.is-active .nav-icon {
+  opacity: 0.95;
+}
+
+/* =========================================================================
+   Doc page layout. Section numbers live in a left gutter; DocHeader / footer
+   pull themselves left by --llm-gutter to span the full content frame.
+   ========================================================================= */
+.VPDoc {
+  padding-top: 2.25rem !important;
+}
+
+@media (min-width: 960px) {
+  .VPDoc:not(.has-aside) .content-container {
+    max-width: 768px !important;
+  }
+}
+
+.VPDoc .content-container {
+  position: relative;
+  padding-left: var(--llm-gutter);
+}
+
+@media (max-width: 640px) {
+  .VPDoc .content-container {
+    padding-left: 0;
+  }
+}
+
+/* ---- doc content ---- */
+
+/* DocHeader.vue renders the title (with the index rail and page actions), so the markdown h1
+   would be a duplicate. */
+.vp-doc > div > h1 {
+  display: none;
+}
+
+.vp-doc > div {
+  counter-reset: llm-section;
+}
+
+.vp-doc h2 {
+  position: relative;
+  margin: 3.25rem 0 1.15rem !important;
+  padding-top: 1.6rem !important;
+  border-top: 1px solid var(--llm-line) !important;
+  font-family: var(--llm-display);
+  font-size: 1.45rem !important;
+  font-weight: 550 !important;
+  letter-spacing: -0.025em !important;
+  color: #fff !important;
+}
+
+/* Section number in the left gutter. */
+.vp-doc h2::before {
+  counter-increment: llm-section;
+  content: counter(llm-section, decimal-leading-zero);
+  position: absolute;
+  top: 1.55rem;
+  left: calc(var(--llm-gutter) * -1);
+  width: var(--llm-gutter);
+  padding-right: 0.85rem;
+  font-family: var(--llm-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-align: right;
+  color: rgb(255 255 255 / 0.3);
+}
+
+@media (max-width: 640px) {
+  .vp-doc h2::before {
+    display: none;
+  }
+}
+
+.vp-doc h3 {
+  font-family: var(--llm-display);
+  font-size: 1.08rem !important;
+  font-weight: 550 !important;
+  letter-spacing: -0.015em;
+  color: rgb(255 255 255 / 0.92) !important;
+}
+
+.vp-doc p,
+.vp-doc li {
+  color: rgb(255 255 255 / 0.72);
+}
+
+.vp-doc ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.vp-doc ul > li {
+  position: relative;
+  padding-left: 1.15rem;
+}
+
+/* Mono dashes read as a parts list, which is the register the rest of the page is in. */
+.vp-doc ul > li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  font-family: var(--llm-mono);
+  font-size: 11px;
+  color: rgb(255 255 255 / 0.28);
+}
+
+.vp-doc ol {
+  padding-left: 1.35rem;
+}
+
+.vp-doc ol > li::marker {
+  font-family: var(--llm-mono);
+  font-size: 11px;
+  color: rgb(255 255 255 / 0.4);
+}
+
+.vp-doc a {
+  text-decoration-color: rgb(255 255 255 / 0.28);
+  text-underline-offset: 3px;
+}
+
+.vp-doc code {
+  font-family: var(--llm-mono);
+}
+
+.vp-doc table {
+  border: 1px solid var(--llm-line);
+}
+
+.vp-doc th {
+  font-family: var(--llm-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.42);
+}
+
+/* ---- code blocks: filename title bar (see config.ts fence plugin) ---- */
+.code-title {
+  display: flex;
+  align-items: center;
+  height: 2.35rem;
+  margin: 16px 0 -1px;
+  padding: 0 1rem;
+  border: 1px solid var(--llm-line);
+  border-bottom: none;
+  background: rgb(255 255 255 / 0.035);
+  font-family: var(--llm-mono);
+  font-size: 11px;
+  color: rgb(255 255 255 / 0.56);
+}
+
+.code-title + div[class*="language-"] {
+  margin-top: 0 !important;
+  border: 1px solid var(--llm-line);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.vp-doc div[class*="language-"] {
+  border: 1px solid var(--llm-line);
+  background: #0a0a0a;
+}
+
+.vp-doc div[class*="language-"] code {
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.vp-doc [class*="language-"] > span.lang {
+  font-family: var(--llm-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.3);
+}
+
+.vp-doc [class*="language-"] > button.copy {
+  border: 1px solid var(--llm-line) !important;
+  background-color: rgb(255 255 255 / 0.04) !important;
+}
+
+.vp-doc [class*="language-"] > button.copy:hover {
+  border-color: rgb(255 255 255 / 0.28) !important;
+  background-color: rgb(255 255 255 / 0.1) !important;
+}
+
+.vp-doc .line-numbers-wrapper {
+  font-family: var(--llm-mono);
+  color: rgb(255 255 255 / 0.2);
+}
+
+/* Highlighted / diff lines: brightness instead of colour. */
+.vp-doc .has-highlighted-lines .highlighted {
+  background-color: rgb(255 255 255 / 0.07) !important;
+  box-shadow: inset 2px 0 0 rgb(255 255 255 / 0.55);
+}
+
+.vp-doc .has-diff .diff.add {
+  background-color: rgb(255 255 255 / 0.07) !important;
+}
+
+.vp-doc .has-diff .diff.remove {
+  background-color: rgb(255 255 255 / 0.03) !important;
+  opacity: 0.6;
+}
+
+/* ---- code groups: a segmented mono control, like the provider rail ---- */
+.vp-doc .vp-code-group .tabs {
+  border: 1px solid var(--llm-line);
+  border-bottom: 0;
+  background: rgb(255 255 255 / 0.025) !important;
+  box-shadow: none !important;
+}
+
+.vp-doc .vp-code-group .tabs label {
+  height: 2.4rem;
+  padding: 0 1rem;
+  border-right: 1px solid var(--llm-line);
+  font-family: var(--llm-mono);
+  font-size: 10px !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.45);
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.vp-doc .vp-code-group .tabs label:hover {
+  background: rgb(255 255 255 / 0.05);
+  color: rgb(255 255 255 / 0.85);
+}
+
+.vp-doc .vp-code-group .tabs input:checked + label {
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+}
+
+/* Kill the sliding brand-coloured underline — the filled tile is the active state now. */
+.vp-doc .vp-code-group .tabs::after,
+.vp-doc .vp-code-group .tabs label::after {
+  display: none !important;
+}
+
+.vp-doc .vp-code-group div[class*="language-"] {
+  margin-top: 0 !important;
+}
+
+/* ---- inline code ---- */
+.vp-doc :not(pre) > code {
+  border: 1px solid var(--llm-line-soft);
+  padding: 2px 5px;
+  background: rgb(255 255 255 / 0.05) !important;
+  font-size: 0.86em;
+  color: rgb(255 255 255 / 0.88) !important;
+}
+
+.vp-doc a > code {
+  color: #fff !important;
+}
+
+/* ---- callouts ---- */
+.vp-doc .custom-block {
+  border: 1px solid var(--llm-line);
+  border-left-width: 2px;
+  padding: 1rem 1.15rem;
+  background: rgb(255 255 255 / 0.025) !important;
+  font-size: 0.94rem;
+}
+
+.vp-doc .custom-block .custom-block-title {
+  font-family: var(--llm-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.62);
+}
+
+.vp-doc .custom-block a {
+  color: #fff;
+}
+
+.vp-doc blockquote {
+  border-left: 2px solid rgb(255 255 255 / 0.2);
+  padding-left: 1.1rem;
+  color: rgb(255 255 255 / 0.55);
+}
+
+.vp-doc hr {
+  border-top: 1px solid var(--llm-line);
+}
+
+/* ---- "on this page" outline ---- */
+.VPDocAside {
+  padding-left: 1.35rem;
+  border-left: 1px solid var(--llm-line);
+}
+
+.VPDocAsideOutline {
+  border-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.VPDocOutlineItem.root {
+  counter-reset: llm-outline;
+}
+
+/* Top-level entries mirror the section numbers on the page itself. */
+.VPDocOutlineItem.root > li > .outline-link::before {
+  counter-increment: llm-outline;
+  content: counter(llm-outline, decimal-leading-zero);
+  margin-right: 0.55rem;
+  font-family: var(--llm-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: rgb(255 255 255 / 0.26);
+}
+
+.VPDocAsideOutline .outline-title {
+  font-family: var(--llm-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.34);
+}
+
+.VPDocAsideOutline .outline-link {
+  font-size: 12.5px;
+  color: rgb(255 255 255 / 0.48);
+  transition: color 120ms ease;
+}
+
+.VPDocAsideOutline .outline-link:hover {
+  color: #fff;
+}
+
+.VPDocAsideOutline .outline-link.active {
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.VPDocAsideOutline .outline-marker {
+  background-color: #fff !important;
+  width: 1px;
+}
+
+/* ---- doc footer: pulled left so its bands span the whole frame ---- */
+.VPDocFooter {
+  margin-left: calc(var(--llm-gutter) * -1);
+  margin-top: 2.5rem !important;
+  border-top: 1px solid var(--llm-line) !important;
+  padding-top: 1.1rem !important;
+}
+
+@media (max-width: 640px) {
+  .VPDocFooter {
+    margin-left: 0;
+  }
+}
+
+.edit-link-button,
+.pager-link {
+  font-family: var(--llm-mono) !important;
+  font-size: 11px !important;
+  border-color: var(--llm-line) !important;
+}
+
+.VPDocFooter .edit-info {
+  padding-bottom: 1rem !important;
+}
+
+.VPDocFooter .edit-link-button {
+  font-size: 9.5px !important;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.5) !important;
+}
+
+.VPDocFooter .edit-link-button:hover {
+  color: #fff !important;
+}
+
+.VPDocFooter .prev-next {
+  display: flex !important;
+  gap: 0 !important;
+  border: 1px solid var(--llm-line);
+  border-top-width: 1px !important;
+  padding-top: 0 !important;
+}
+
+.VPDocFooter .pager {
+  flex: 1;
+  min-width: 0;
+  padding: 0 !important;
+}
+
+/* First or last page: the empty half would otherwise sit there as a blank box. */
+.VPDocFooter .pager:not(:has(.pager-link)) {
+  display: none;
+}
+
+/* Two tiles sharing one hairline, instead of two floating cards. */
+.VPDocFooter .pager:has(.pager-link) + .pager:has(.pager-link) {
+  border-left: 1px solid var(--llm-line);
+}
+
+.VPDocFooter .pager-link {
+  position: relative;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 1.15rem 1.2rem !important;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+/* The keyboard shortcut DocChrome.vue listens for, shown where it is relevant. */
+.VPDocFooter .pager-link::after {
+  position: absolute;
+  top: 1.05rem;
+  border: 1px solid var(--llm-line);
+  padding: 0.05rem 0.3rem;
+  font-family: var(--llm-mono);
+  font-size: 9px;
+  color: rgb(255 255 255 / 0.3);
+}
+
+.VPDocFooter .pager-link.prev::after {
+  content: "[";
+  right: 1.1rem;
+}
+
+.VPDocFooter .pager-link.next::after {
+  content: "]";
+  left: 1.1rem;
+}
+
+.VPDocFooter .pager-link:hover {
+  border-color: rgb(255 255 255 / 0.28) !important;
+  background: rgb(255 255 255 / 0.06) !important;
+}
+
+.VPDocFooter .pager-link .desc {
+  font-family: var(--llm-mono);
+  font-size: 9px !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.34) !important;
+}
+
+.VPDocFooter .pager-link .title {
+  font-family: var(--llm-display) !important;
+  font-size: 0.98rem !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.015em;
+  color: rgb(255 255 255 / 0.82) !important;
+}
+
+.VPDocFooter .pager-link:hover .title {
+  color: #fff !important;
+}
+
+.VPLastUpdated,
+.VPDocFooterLastUpdated {
+  font-family: var(--llm-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.3);
+}
+
+/* ---- local search ---- */
+.VPLocalSearchBox .shell,
+.VPLocalSearchBox .search-bar,
+.VPLocalSearchBox .result {
+  border-radius: 0 !important;
+}
+
+.VPLocalSearchBox .backdrop {
+  background: rgb(0 0 0 / 0.72);
+}
+
+.VPLocalSearchBox .shell {
+  border: 1px solid rgb(255 255 255 / 0.14);
+  background: #060606;
+  box-shadow: 0 30px 90px rgb(0 0 0 / 0.6);
+}
+
+.VPLocalSearchBox .search-bar {
+  border: 1px solid var(--llm-line);
+  background: rgb(255 255 255 / 0.03);
+}
+
+.VPLocalSearchBox .search-input {
+  font-family: var(--llm-mono);
+  font-size: 13px;
+}
+
+.VPLocalSearchBox .search-keyboard-shortcuts kbd,
+.VPLocalSearchBox .search-actions button {
+  border-radius: 0 !important;
+  font-family: var(--llm-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.VPLocalSearchBox .result {
+  border: 1px solid var(--llm-line);
+  background: rgb(255 255 255 / 0.02);
+}
+
+.VPLocalSearchBox .result.selected {
+  border-color: rgb(255 255 255 / 0.3);
+  background: rgb(255 255 255 / 0.07);
+}
+
+.VPLocalSearchBox .titles .title {
+  font-size: 13px;
+}
+
+.VPLocalSearchBox mark {
+  background: transparent !important;
+  color: #fff !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---- outer rails: the landing page's hatched gutters, echoed on wide screens ----
+   Sized to exactly fill the margin outside the layout, and stacked above the sidebar (z-index
+   25), whose background bleeds all the way to the viewport edge. */
+@media (min-width: 1560px) {
+  .VPContent:not(.is-home)::before,
+  .VPContent:not(.is-home)::after {
+    content: "";
+    position: fixed;
+    top: var(--vp-nav-height);
+    bottom: 0;
+    width: calc((100vw - var(--vp-layout-max-width)) / 2);
+    z-index: 26;
+    pointer-events: none;
+    opacity: 0.5;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      rgb(255 255 255 / 0.06) 4px,
+      rgb(255 255 255 / 0.06) 5px
+    );
+  }
+
+  .VPContent:not(.is-home)::before {
+    left: 0;
+    border-right: 1px solid var(--llm-line);
+  }
+
+  .VPContent:not(.is-home)::after {
+    right: 0;
+    border-left: 1px solid var(--llm-line);
+  }
+}
