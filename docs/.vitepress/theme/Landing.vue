@@ -57,9 +57,9 @@ const footerGroups = [
   },
   {
     title: "Project",
-    action: ["View source", "https://github.com/your-org/llm-sdk"] as const,
+    action: ["View source", "https://github.com/ALPHACOD3RS/llm-sdk"] as const,
     links: [
-      ["GitHub", "https://github.com/your-org/llm-sdk"],
+      ["GitHub", "https://github.com/ALPHACOD3RS/llm-sdk"],
       ["Testing / mock", "/guide/testing"],
       ["Providers", "/guide/providers"],
       ["Changelog", "/guide/changelog"],
@@ -90,7 +90,7 @@ const mosaic = [
   <div class="llm-home">
     <a
       class="announce llm-mono"
-      href="https://github.com/your-org/llm-sdk"
+      href="https://github.com/ALPHACOD3RS/llm-sdk"
       rel="noreferrer"
       target="_blank"
     >
@@ -121,7 +121,7 @@ const mosaic = [
         <div class="header__actions">
           <a
             class="icon-btn"
-            href="https://github.com/your-org/llm-sdk"
+            href="https://github.com/ALPHACOD3RS/llm-sdk"
             aria-label="GitHub"
             rel="noreferrer"
             target="_blank"

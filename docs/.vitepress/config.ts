@@ -83,7 +83,7 @@ export default defineConfigWithTheme<ThemeConfig>({
       { text: "API", link: "/api/create-router" },
       {
         text: "GitHub",
-        link: "https://github.com/your-org/llm-sdk",
+        link: "https://github.com/ALPHACOD3RS/llm-sdk",
       },
     ],
 
@@ -117,7 +117,7 @@ export default defineConfigWithTheme<ThemeConfig>({
     },
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/your-org/llm-sdk" },
+      { icon: "github", link: "https://github.com/ALPHACOD3RS/llm-sdk" },
     ],
 
     search: {
@@ -126,7 +126,7 @@ export default defineConfigWithTheme<ThemeConfig>({
 
     outline: { level: [2, 3] },
     editLink: {
-      pattern: "https://github.com/your-org/llm-sdk/edit/main/docs/:path",
+      pattern: "https://github.com/ALPHACOD3RS/llm-sdk/edit/main/docs/:path",
       text: "Edit this page",
     },
   },
