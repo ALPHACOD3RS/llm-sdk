@@ -198,7 +198,7 @@ export class AnthropicAdapter implements Adapter {
     };
   }
 
-  /** Streaming does not emit tool calls; use `complete()`. */
+  /** Streaming accumulates `tool_use` blocks from `input_json_delta` events; surfaced on `done`. */
   async *stream(request: AdapterRequest): AsyncGenerator<AdapterStreamEvent> {
     const response = await this.post(request, { stream: true });
 
@@ -208,13 +208,16 @@ export class AnthropicAdapter implements Adapter {
 
     let usage: Usage = { input: 0, output: 0 };
     let stopReason: string | undefined;
+    const toolBlocks = new Map<number, { id?: string; name?: string; json: string }>();
 
     try {
       for await (const evt of readSseEvents(response.body)) {
         if (!evt.data) continue;
         let parsed: {
           message?: { usage?: { input_tokens?: number } };
-          delta?: { type?: string; text?: string; stop_reason?: string };
+          index?: number;
+          content_block?: { type?: string; id?: string; name?: string };
+          delta?: { type?: string; text?: string; partial_json?: string; stop_reason?: string };
           usage?: { output_tokens?: number };
           error?: { type?: string; message?: string };
         };
@@ -226,8 +229,17 @@ export class AnthropicAdapter implements Adapter {
 
         if (evt.event === "message_start") {
           usage.input = parsed.message?.usage?.input_tokens ?? 0;
+        } else if (evt.event === "content_block_start" && parsed.content_block?.type === "tool_use") {
+          toolBlocks.set(parsed.index ?? 0, {
+            ...(parsed.content_block.id ? { id: parsed.content_block.id } : {}),
+            ...(parsed.content_block.name ? { name: parsed.content_block.name } : {}),
+            json: "",
+          });
         } else if (evt.event === "content_block_delta" && parsed.delta?.type === "text_delta") {
           if (parsed.delta.text) yield { type: "delta", text: parsed.delta.text };
+        } else if (evt.event === "content_block_delta" && parsed.delta?.type === "input_json_delta") {
+          const block = toolBlocks.get(parsed.index ?? 0);
+          if (block && parsed.delta.partial_json) block.json += parsed.delta.partial_json;
         } else if (evt.event === "message_delta") {
           if (parsed.usage?.output_tokens !== undefined) usage.output = parsed.usage.output_tokens;
           if (parsed.delta?.stop_reason) stopReason = parsed.delta.stop_reason;
@@ -254,6 +266,18 @@ export class AnthropicAdapter implements Adapter {
       });
     }
 
-    yield { type: "done", usage, toolCalls: [], ...(stopReason ? { finishReason: stopReason } : {}) };
+    const toolCalls: ToolCall[] = [...toolBlocks.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([, b], i) => {
+        let args: unknown;
+        try {
+          args = b.json ? JSON.parse(b.json) : {};
+        } catch {
+          args = b.json;
+        }
+        return { id: b.id ?? `call_${i}`, name: b.name ?? "", args };
+      });
+
+    yield { type: "done", usage, toolCalls, ...(stopReason ? { finishReason: stopReason } : {}) };
   }
 }

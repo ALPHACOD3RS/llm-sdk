@@ -23,13 +23,24 @@ function sseResponse(frames: string): Response {
 }
 
 async function collectStream(
-  gen: AsyncIterable<{ type: string; text?: string; usage?: unknown; finishReason?: string }>,
+  gen: AsyncIterable<{
+    type: string;
+    text?: string;
+    usage?: unknown;
+    toolCalls?: unknown[];
+    finishReason?: string;
+  }>,
 ) {
   const deltas: string[] = [];
-  let done: { usage: unknown; finishReason?: string } | undefined;
+  let done: { usage: unknown; toolCalls: unknown[]; finishReason?: string } | undefined;
   for await (const evt of gen) {
     if (evt.type === "delta") deltas.push(evt.text ?? "");
-    else done = { usage: evt.usage, ...(evt.finishReason ? { finishReason: evt.finishReason } : {}) };
+    else
+      done = {
+        usage: evt.usage,
+        toolCalls: evt.toolCalls ?? [],
+        ...(evt.finishReason ? { finishReason: evt.finishReason } : {}),
+      };
   }
   return { deltas, done };
 }
@@ -128,7 +139,45 @@ describe("OpenAIAdapter", () => {
     );
 
     expect(deltas).toEqual(["Hello", " world"]);
-    expect(done).toEqual({ usage: { input: 5, output: 2 }, finishReason: "stop" });
+    expect(done).toEqual({ usage: { input: 5, output: 2 }, toolCalls: [], finishReason: "stop" });
+  });
+
+  it("accumulates streamed tool_calls deltas across chunks into a finished call", async () => {
+    const frames = [
+      `data: ${JSON.stringify({
+        choices: [
+          {
+            delta: {
+              tool_calls: [{ index: 0, id: "call_1", function: { name: "getWeather", arguments: "" } }],
+            },
+          },
+        ],
+      })}`,
+      `data: ${JSON.stringify({
+        choices: [{ delta: { tool_calls: [{ index: 0, function: { arguments: '{"city":' } }] } }],
+      })}`,
+      `data: ${JSON.stringify({
+        choices: [{ delta: { tool_calls: [{ index: 0, function: { arguments: '"Addis Ababa"}' } }] } }],
+      })}`,
+      `data: ${JSON.stringify({
+        choices: [{ delta: {}, finish_reason: "tool_calls" }],
+        usage: { prompt_tokens: 5, completion_tokens: 10 },
+      })}`,
+      "data: [DONE]",
+    ].join("\n\n");
+    fetchMock.mockResolvedValue(sseResponse(frames));
+    const adapter = new OpenAIAdapter({ apiKey: "sk-test" });
+
+    const { done } = await collectStream(
+      adapter.stream({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: "weather?" }],
+        tools: [{ name: "getWeather", schema: { type: "object" } }],
+      }),
+    );
+
+    expect(done?.toolCalls).toEqual([{ id: "call_1", name: "getWeather", args: { city: "Addis Ababa" } }]);
+    expect(done?.finishReason).toBe("tool_calls");
   });
 
   it("classifies a content_filter finish_reason mid-stream", async () => {
@@ -332,7 +381,42 @@ describe("AnthropicAdapter", () => {
     );
 
     expect(deltas).toEqual(["Hello", " world"]);
-    expect(done).toEqual({ usage: { input: 10, output: 2 }, finishReason: "end_turn" });
+    expect(done).toEqual({ usage: { input: 10, output: 2 }, toolCalls: [], finishReason: "end_turn" });
+  });
+
+  it("accumulates a streamed tool_use block's input_json_delta chunks into a finished call", async () => {
+    const frames = [
+      `event: content_block_start\ndata: ${JSON.stringify({
+        index: 0,
+        content_block: { type: "tool_use", id: "toolu_1", name: "getWeather" },
+      })}`,
+      `event: content_block_delta\ndata: ${JSON.stringify({
+        index: 0,
+        delta: { type: "input_json_delta", partial_json: '{"city":' },
+      })}`,
+      `event: content_block_delta\ndata: ${JSON.stringify({
+        index: 0,
+        delta: { type: "input_json_delta", partial_json: '"Addis Ababa"}' },
+      })}`,
+      `event: content_block_stop\ndata: ${JSON.stringify({ index: 0 })}`,
+      `event: message_delta\ndata: ${JSON.stringify({
+        delta: { stop_reason: "tool_use" },
+        usage: { output_tokens: 10 },
+      })}`,
+    ].join("\n\n");
+    fetchMock.mockResolvedValue(sseResponse(frames));
+    const adapter = new AnthropicAdapter({ apiKey: "sk-ant-test" });
+
+    const { done } = await collectStream(
+      adapter.stream({
+        model: "claude-sonnet-4-5",
+        messages: [{ role: "user", content: "weather?" }],
+        tools: [{ name: "getWeather", schema: { type: "object" } }],
+      }),
+    );
+
+    expect(done?.toolCalls).toEqual([{ id: "toolu_1", name: "getWeather", args: { city: "Addis Ababa" } }]);
+    expect(done?.finishReason).toBe("tool_use");
   });
 
   it("classifies a mid-stream error event by Anthropic error type", async () => {

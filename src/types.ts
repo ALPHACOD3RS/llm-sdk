@@ -204,6 +204,6 @@ export type AdapterStreamEvent = AdapterStreamDelta | AdapterStreamDone;
 export interface Adapter {
   readonly name: ProviderName | string;
   complete(request: AdapterRequest): Promise<AdapterResponse>;
-  /** Streaming does not emit tool calls; use `complete()`. */
+  /** Tool call deltas are accumulated across the stream and surfaced on the `done` event. */
   stream(request: AdapterRequest): AsyncIterable<AdapterStreamEvent>;
 }

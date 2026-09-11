@@ -150,7 +150,43 @@ export async function openAiCompatibleComplete(
   };
 }
 
-/** OpenAI-compatible streaming. Tool calls are not accumulated; use `complete()`. */
+interface StreamedToolCall {
+  id?: string;
+  name?: string;
+  args: string;
+}
+
+/** Merge one delta.tool_calls chunk into the by-index accumulator. */
+function accumulateToolCallDelta(
+  acc: Map<number, StreamedToolCall>,
+  deltas: Array<{ index?: number; id?: string; function?: { name?: string; arguments?: string } }>,
+): void {
+  for (const d of deltas) {
+    const index = d.index ?? 0;
+    const entry = acc.get(index) ?? { args: "" };
+    if (d.id) entry.id = d.id;
+    if (d.function?.name) entry.name = d.function.name;
+    if (d.function?.arguments) entry.args += d.function.arguments;
+    acc.set(index, entry);
+  }
+}
+
+/** Resolve accumulated deltas into finished tool calls, parsing each call's JSON args. */
+function finalizeToolCalls(acc: Map<number, StreamedToolCall>): ToolCall[] {
+  return [...acc.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([, c], i) => {
+      let args: unknown;
+      try {
+        args = c.args ? JSON.parse(c.args) : {};
+      } catch {
+        args = c.args;
+      }
+      return { id: c.id ?? `call_${i}`, name: c.name ?? "", args };
+    });
+}
+
+/** OpenAI-compatible streaming. Tool call deltas are accumulated and surfaced on the `done` event. */
 export async function* openAiCompatibleStream(
   adapter: { name: string; baseUrl: string; apiKey: string },
   request: AdapterRequest,
@@ -177,12 +213,23 @@ export async function* openAiCompatibleStream(
 
   let usage: Usage = { input: 0, output: 0 };
   let finishReason: string | undefined;
+  const toolCallAcc = new Map<number, StreamedToolCall>();
 
   try {
     for await (const evt of readSseEvents(response.body)) {
       if (!evt.data || evt.data === "[DONE]") continue;
       let parsed: {
-        choices?: Array<{ delta?: { content?: string }; finish_reason?: string }>;
+        choices?: Array<{
+          delta?: {
+            content?: string;
+            tool_calls?: Array<{
+              index?: number;
+              id?: string;
+              function?: { name?: string; arguments?: string };
+            }>;
+          };
+          finish_reason?: string;
+        }>;
         usage?: { prompt_tokens?: number; completion_tokens?: number };
       };
       try {
@@ -194,6 +241,9 @@ export async function* openAiCompatibleStream(
       const choice = parsed.choices?.[0];
       if (typeof choice?.delta?.content === "string" && choice.delta.content.length > 0) {
         yield { type: "delta", text: choice.delta.content };
+      }
+      if (choice?.delta?.tool_calls?.length) {
+        accumulateToolCallDelta(toolCallAcc, choice.delta.tool_calls);
       }
       if (choice?.finish_reason) finishReason = choice.finish_reason;
       if (parsed.usage) {
@@ -219,7 +269,12 @@ export async function* openAiCompatibleStream(
     });
   }
 
-  yield { type: "done", usage, toolCalls: [], ...(finishReason ? { finishReason } : {}) };
+  yield {
+    type: "done",
+    usage,
+    toolCalls: finalizeToolCalls(toolCallAcc),
+    ...(finishReason ? { finishReason } : {}),
+  };
 }
 
 export function requireApiKey(
