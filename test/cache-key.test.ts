@@ -64,6 +64,16 @@ describe("cacheKey", () => {
       tools: [{ name: "weather", schema: zodLike }],
     });
     expect(a).toBe(b);
-    expect(a).toContain('"type":"object"');
+  });
+
+  it("returns a bounded SHA-256 hex digest regardless of prompt size", () => {
+    const key = cacheKey(["openai/a"], [{ role: "user", content: "x".repeat(50_000) }]);
+    expect(key).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("is independent of object key order", () => {
+    const a = cacheKey(["openai/a"], [{ role: "user", content: "hi" }]);
+    const b = cacheKey(["openai/a"], [{ content: "hi", role: "user" }]);
+    expect(a).toBe(b);
   });
 });
