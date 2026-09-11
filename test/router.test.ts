@@ -91,6 +91,37 @@ describe("createRouter", () => {
     expect(b.cached).toBe(true);
   });
 
+  it("does not reuse a cache hit when tools differ", async () => {
+    const llm = createRouter({
+      primary: "test/cache",
+      cache: { ttl: "1h" },
+      adapters: { test: new FakeAdapter("test", { responses: ["with-a", "with-b"] }) },
+    });
+
+    const toolsA = [{ name: "a", schema: { type: "object", properties: {} } }];
+    const toolsB = [{ name: "b", schema: { type: "object", properties: {} } }];
+
+    const a = await llm.complete("same", { tools: toolsA });
+    const b = await llm.complete("same", { tools: toolsB });
+    expect(a.text).toBe("with-a");
+    expect(b.text).toBe("with-b");
+    expect(b.cached).toBe(false);
+  });
+
+  it("does not reuse a cache hit when raw params differ", async () => {
+    const llm = createRouter({
+      primary: "test/cache",
+      cache: { ttl: "1h" },
+      adapters: { test: new FakeAdapter("test", { responses: ["seed-1", "seed-2"] }) },
+    });
+
+    const a = await llm.complete("same", { raw: { openai: { seed: 1 } } });
+    const b = await llm.complete("same", { raw: { openai: { seed: 2 } } });
+    expect(a.text).toBe("seed-1");
+    expect(b.text).toBe("seed-2");
+    expect(b.cached).toBe(false);
+  });
+
   it("does not cache when temperature > 0 by default", async () => {
     const llm = createRouter({
       primary: "test/cache",

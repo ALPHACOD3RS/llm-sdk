@@ -103,11 +103,13 @@ export class RouterImpl<R extends string> implements Router<R> {
 
   async complete(input: CompleteArg, call: CallOptions = {}): Promise<CompleteResult> {
     const prepared = this.prepareCall(input, call);
-    const { options, modelChain, messages, temperature, maxTokens } = prepared;
+    const { options, modelChain, messages, temperature, maxTokens, tools } = prepared;
 
     const keyOpts = {
       ...(temperature !== undefined ? { temperature } : {}),
       ...(maxTokens !== undefined ? { maxTokens } : {}),
+      ...(tools !== undefined ? { tools } : {}),
+      ...(options.raw !== undefined ? { raw: options.raw } : {}),
     };
 
     const cacheEnabled = cacheAllowed(options.cache, temperature);
@@ -220,11 +222,13 @@ export class RouterImpl<R extends string> implements Router<R> {
 
   stream(input: CompleteArg, call: CallOptions = {}): StreamHandle {
     const prepared = this.prepareCall(input, call);
-    const { options, modelChain, messages, temperature, maxTokens } = prepared;
+    const { options, modelChain, messages, temperature, maxTokens, tools } = prepared;
 
     const keyOpts = {
       ...(temperature !== undefined ? { temperature } : {}),
       ...(maxTokens !== undefined ? { maxTokens } : {}),
+      ...(tools !== undefined ? { tools } : {}),
+      ...(options.raw !== undefined ? { raw: options.raw } : {}),
     };
     const cacheEnabled = cacheAllowed(options.cache, temperature);
 

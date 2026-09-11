@@ -25,4 +25,45 @@ describe("cacheKey", () => {
     const b = cacheKey(["openai/a", "openai/b"], [{ role: "user", content: "hi" }]);
     expect(a).not.toBe(b);
   });
+
+  it("changes when tools change", () => {
+    const messages = [{ role: "user" as const, content: "hi" }];
+    const a = cacheKey(["openai/a"], messages, {
+      tools: [{ name: "lookup", schema: { type: "object", properties: { id: { type: "string" } } } }],
+    });
+    const b = cacheKey(["openai/a"], messages, {
+      tools: [{ name: "search", schema: { type: "object", properties: { q: { type: "string" } } } }],
+    });
+    expect(a).not.toBe(b);
+  });
+
+  it("changes when raw provider params change", () => {
+    const messages = [{ role: "user" as const, content: "hi" }];
+    const a = cacheKey(["openai/a"], messages, { raw: { openai: { seed: 1 } } });
+    const b = cacheKey(["openai/a"], messages, { raw: { openai: { seed: 2 } } });
+    expect(a).not.toBe(b);
+  });
+
+  it("normalizes Zod-like tool schemas so equivalent shapes share a key", () => {
+    const messages = [{ role: "user" as const, content: "hi" }];
+    const zodLike = {
+      _def: {
+        typeName: "ZodObject",
+        shape: () => ({
+          city: { _def: { typeName: "ZodString" } },
+        }),
+      },
+      shape: {
+        city: { _def: { typeName: "ZodString" } },
+      },
+    };
+    const a = cacheKey(["openai/a"], messages, {
+      tools: [{ name: "weather", schema: zodLike }],
+    });
+    const b = cacheKey(["openai/a"], messages, {
+      tools: [{ name: "weather", schema: zodLike }],
+    });
+    expect(a).toBe(b);
+    expect(a).toContain('"type":"object"');
+  });
 });
