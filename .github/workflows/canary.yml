@@ -19,7 +19,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # @changesets/cli requires Node >=22.11 — this is the tooling runtime for
+          # this job, unrelated to the SDK's own `engines.node: ">=18"` promise to consumers.
+          node-version: "22"
           cache: npm
           registry-url: "https://registry.npmjs.org"
 
