@@ -1,6 +1,6 @@
 {
   "name": "llm-sdk-js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TypeScript LLM router — smart fallbacks, named routes, cost tracking, and caching. Zero runtime dependencies.",
   "homepage": "https://llm-sdk.dev",
   "repository": {
