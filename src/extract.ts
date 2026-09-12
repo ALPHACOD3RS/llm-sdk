@@ -86,6 +86,7 @@ export async function extractWithSchema<S, T = InferSchemaOutput<S>>(
         model: res.model,
         usage: res.usage,
         cost: res.cost,
+        unknownModel: res.unknownModel,
         cached: res.cached,
         latencyMs: res.latencyMs,
         attempts: res.attempts,

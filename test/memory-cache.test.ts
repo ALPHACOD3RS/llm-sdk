@@ -3,7 +3,15 @@ import { MemoryCache } from "../src/cache/memory.js";
 import type { CacheEntry } from "../src/cache/types.js";
 
 function entry(text: string): CacheEntry {
-  return { text, provider: "test", model: "m", usage: { input: 0, output: 0 }, cost: 0, toolCalls: [] };
+  return {
+    text,
+    provider: "test",
+    model: "m",
+    usage: { input: 0, output: 0 },
+    cost: 0,
+    unknownModel: true,
+    toolCalls: [],
+  };
 }
 
 describe("MemoryCache", () => {

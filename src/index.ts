@@ -34,4 +34,4 @@ export type {
 
 export { BadRequest, AllProvidersFailed, ProviderError } from "./errors.js";
 export type { ErrorKind } from "./errors.js";
-export { cost, estimateCost, PRICING, PRICES } from "./pricing/index.js";
+export { cost, estimateCost, isKnownModel, PRICING, PRICES } from "./pricing/index.js";

@@ -149,6 +149,40 @@ describe("createRouter", () => {
     expect(b.text).toBe("once");
     expect(b.cached).toBe(true);
   });
+
+  it("flags unknownModel when the model has no row in the price table", async () => {
+    const llm = createRouter({
+      primary: "test/totally-made-up-model",
+      adapters: { test: new FakeAdapter("test", { responses: ["hi"] }) },
+    });
+
+    const res = await llm.complete("x");
+    expect(res.cost).toBe(0);
+    expect(res.unknownModel).toBe(true);
+  });
+
+  it("does not flag unknownModel for a model present in the price table", async () => {
+    const llm = createRouter({
+      primary: "test/gpt-4o-mini",
+      adapters: { test: new FakeAdapter("test", { responses: ["hi"] }) },
+    });
+
+    const res = await llm.complete("x");
+    expect(res.unknownModel).toBe(false);
+  });
+
+  it("preserves unknownModel through a cache hit", async () => {
+    const llm = createRouter({
+      primary: "test/totally-made-up-model",
+      cache: { ttl: "1h" },
+      adapters: { test: new FakeAdapter("test", { responses: ["once", "twice"] }) },
+    });
+
+    await llm.complete("same");
+    const hit = await llm.complete("same");
+    expect(hit.cached).toBe(true);
+    expect(hit.unknownModel).toBe(true);
+  });
 });
 
 describe("AllProvidersFailed", () => {

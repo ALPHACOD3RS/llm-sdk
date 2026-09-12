@@ -5,7 +5,7 @@ import { cacheAllowed } from "../policy/cache.js";
 import { errorLabel, reclassifyFatal, skipsSameProviderRetry } from "../policy/fallback.js";
 import { computeBackoff, sleep } from "../policy/retry.js";
 import { TimeoutBudget } from "../policy/timeout.js";
-import { cost } from "../pricing/index.js";
+import { cost, isKnownModel } from "../pricing/index.js";
 import type {
   AttemptRecord,
   CallOptions,
@@ -157,6 +157,7 @@ export class RouterImpl<R extends string> implements Router<R> {
             model: parsed.model,
             usage: response.usage,
             cost: estimated,
+            unknownModel: !isKnownModel(parsed.model),
             cached: false,
             latencyMs: ms,
             attempts,
@@ -170,6 +171,7 @@ export class RouterImpl<R extends string> implements Router<R> {
               model: result.model,
               usage: result.usage,
               cost: result.cost,
+              unknownModel: result.unknownModel,
               toolCalls: result.toolCalls,
             };
             this.state.cache.set(
@@ -288,6 +290,7 @@ export class RouterImpl<R extends string> implements Router<R> {
             yield { text: "", done: true };
 
             const estimated = cost(usage, parsed.model);
+            const unknownModel = !isKnownModel(parsed.model);
 
             if (cacheEnabled && options.cache) {
               const entry: CacheEntry = {
@@ -296,6 +299,7 @@ export class RouterImpl<R extends string> implements Router<R> {
                 model: parsed.model,
                 usage,
                 cost: estimated,
+                unknownModel,
                 toolCalls,
               };
               state.cache.set(cacheKey(modelChain, messages, keyOpts), entry, parseTtl(options.cache.ttl ?? "1h"));
@@ -307,6 +311,7 @@ export class RouterImpl<R extends string> implements Router<R> {
               model: parsed.model,
               usage,
               cost: estimated,
+              unknownModel,
               cached: false,
               latencyMs: ms,
               attempts,

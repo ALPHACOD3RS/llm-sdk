@@ -10,6 +10,7 @@ function stubResult(text: string): CompleteResult {
     model: "extract",
     usage: { input: 0, output: 0 },
     cost: 0,
+    unknownModel: true,
     cached: false,
     latencyMs: 0,
     attempts: [],

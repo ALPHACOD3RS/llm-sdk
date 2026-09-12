@@ -82,6 +82,8 @@ export interface CompleteResult {
   model: string;
   usage: Usage;
   cost: number;
+  /** `true` when `model` had no row in the price table — `cost` is `0` because it's unpriced, not free. */
+  unknownModel: boolean;
   cached: boolean;
   latencyMs: number;
   attempts: AttemptRecord[];
@@ -132,6 +134,8 @@ export interface ExtractResult<T = unknown> {
   model: string;
   usage: Usage;
   cost: number;
+  /** `true` when `model` had no row in the price table — `cost` is `0` because it's unpriced, not free. */
+  unknownModel: boolean;
   cached: boolean;
   latencyMs: number;
   attempts: AttemptRecord[];

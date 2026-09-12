@@ -32,6 +32,7 @@ describe("getting started examples", () => {
         "provider",
         "text",
         "toolCalls",
+        "unknownModel",
         "usage",
       ].sort(),
     );

@@ -6,6 +6,7 @@ export interface CacheEntry {
   model: string;
   usage: Usage;
   cost: number;
+  unknownModel: boolean;
   toolCalls: ToolCall[];
 }
 
