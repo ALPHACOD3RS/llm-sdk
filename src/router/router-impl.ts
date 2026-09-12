@@ -222,6 +222,10 @@ export class RouterImpl<R extends string> implements Router<R> {
     return extractWithSchema<S, T>((i, o) => this.complete(i, o), input, call);
   }
 
+  // No retry.attempts loop here, unlike complete() — once a chunk has been yielded to the
+  // caller, retrying the same provider would mean sending conflicting text for the same
+  // span, so a mid-stream failure fails over (pre-flush) or ends the stream (post-flush)
+  // rather than retrying in place. See "Streaming vs complete()" in the fallback guide.
   stream(input: CompleteArg, call: CallOptions = {}): StreamHandle {
     const prepared = this.prepareCall(input, call);
     const { options, modelChain, messages, temperature, maxTokens, tools } = prepared;
