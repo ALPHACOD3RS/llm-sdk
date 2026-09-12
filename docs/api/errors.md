@@ -10,7 +10,7 @@ import {
   AllProvidersFailed,
   ProviderError,
   type ErrorKind,
-} from "llm-sdk";
+} from "llm-sdk-js";
 ```
 
 Behavioral guide: [Errors](/guide/errors).

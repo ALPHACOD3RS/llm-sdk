@@ -1,0 +1,50 @@
+name: canary
+
+on:
+  push:
+    branches:
+      - canary
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          registry-url: "https://registry.npmjs.org"
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      # Snapshot mode needs at least one pending changeset to know what changed;
+      # skip quietly on a push that doesn't carry one instead of failing the job.
+      - name: Check for pending changesets
+        id: status
+        run: |
+          if ls .changeset/*.md 2>/dev/null | grep -qv 'README\.md$'; then
+            echo "has_changesets=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changesets=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Version as a canary snapshot
+        if: steps.status.outputs.has_changesets == 'true'
+        run: npx changeset version --snapshot canary
+
+      - name: Publish canary
+        if: steps.status.outputs.has_changesets == 'true'
+        run: npx changeset publish --tag canary --no-git-tag
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

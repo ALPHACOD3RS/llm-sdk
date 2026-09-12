@@ -9,7 +9,7 @@ App code only needs to branch on two classes. A third export exists for people *
 adapters, not for catching `complete()`.
 
 ```ts
-import { AllProvidersFailed, BadRequest } from "llm-sdk";
+import { AllProvidersFailed, BadRequest } from "llm-sdk-js";
 
 try {
   await llm.complete(prompt);
@@ -75,7 +75,7 @@ interface AttemptRecord {
 ## `ProviderError` (for adapters)
 
 ```ts
-import { ProviderError, type ErrorKind } from "llm-sdk";
+import { ProviderError, type ErrorKind } from "llm-sdk-js";
 
 throw new ProviderError("rate limited", {
   kind: "rate_limit",

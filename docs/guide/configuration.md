@@ -113,7 +113,7 @@ Anything not in the table — a gateway, a second OpenAI-compatible host under a
 deterministic test double — registers the same way:
 
 ```ts
-import { createRouter, type Adapter } from "llm-sdk";
+import { createRouter, type Adapter } from "llm-sdk-js";
 
 const llm = createRouter({
   primary: "acme/fast-model",

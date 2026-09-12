@@ -10,3 +10,4 @@ coverage/
 .vitest/
 docs/.vitepress/cache
 docs/.vitepress/dist
+.vitepress/cache/deps

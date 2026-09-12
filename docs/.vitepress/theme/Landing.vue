@@ -572,7 +572,7 @@ expect(res.attempts).toHaveLength(<span class="c-str">2</span>)</code></pre>
             basic.ts
             <span class="panel__right">ts</span>
           </figcaption>
-          <pre class="code-block"><code><span class="c-kw">import</span> { createRouter } <span class="c-kw">from</span> <span class="c-str">"llm-sdk"</span>
+          <pre class="code-block"><code><span class="c-kw">import</span> { createRouter } <span class="c-kw">from</span> <span class="c-str">"llm-sdk-js"</span>
 
 <span class="c-kw">const</span> llm = createRouter({
   primary: <span class="c-str">"anthropic/claude-sonnet-4-5"</span>,

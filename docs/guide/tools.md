@@ -106,18 +106,19 @@ if (!first.toolCalls.length) {
 
 ## Streaming and tools
 
-Live `stream()` does **not** accumulate tool calls from the wire (`done.toolCalls` is always
-`[]` for a fresh stream). Use `complete()` when you need tools.
+`stream()` accumulates tool call deltas from the wire and surfaces the finished calls on the
+`done` event's `toolCalls` — same shape as `CompleteResult.toolCalls`. Text deltas still arrive
+incrementally; tool calls only resolve once the stream completes, since providers send them as
+partial JSON chunks that aren't safe to parse until the block closes.
 
-A **cache hit** replayed through `stream()` can still surface `toolCalls` that were stored from
-an earlier `complete()` — the cache entry includes them.
+A **cache hit** replayed through `stream()` surfaces `toolCalls` that were stored from an
+earlier call — the cache entry includes them.
 
-## Caching caveat
+## Caching
 
-The cache key today is `modelChain + messages + temperature + maxTokens`. It does **not**
-include `tools` or `raw`. If you enable caching on tool-using calls, two prompts with different
-tool sets can collide. Prefer `cache: false` on tool loops, or keep tools identical for that
-key.
+The cache key includes `tools` and `raw` alongside the model chain, messages, temperature, and
+`maxTokens`. Changing the tool set or provider-specific `raw` params will miss the cache even
+when the prompt text is identical.
 
 ## Next
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-const command = "npm install llm-sdk";
+const command = "npm install llm-sdk-js";
 const copied = ref(false);
 
 async function copy() {

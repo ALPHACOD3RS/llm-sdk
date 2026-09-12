@@ -43,22 +43,26 @@ cache: { ttl: "1h", includeNonDeterministic: true }
 
 ### Cache key
 
+The key is a SHA-256 hex digest of a normalized (object keys sorted, so `{role,content}` and
+`{content,role}` hash the same) JSON payload:
+
 ```ts
-JSON.stringify({
+sha256(JSON.stringify(normalize({
   models: modelChain, // primary + fallbacks actually configured for this call
   messages,
   temperature: temperature ?? null,
   maxTokens: maxTokens ?? null,
-})
+  tools: tools ?? null, // schemas normalized (Zod → JSON Schema)
+  raw: raw ?? null,
+})))
 ```
 
-Same prompt with a different fallback list is a different key. Same prompt via `complete()` and
-`stream()` share a key.
+Hashing keeps the key a fixed 64 hex characters no matter how large the prompt is — the `Map`
+doesn't store the full prompt twice (once as key, once in the cached value).
 
-**Not included today:** `tools`, `raw`, `system` that only lives on the router vs folded into
-`messages` (system is part of the normalized `messages` array, so it *is* covered once
-normalized). If tool definitions change but messages do not, you can get a wrong hit — disable
-cache for tool loops.
+Same prompt with a different fallback list is a different key. Same prompt via `complete()` and
+`stream()` share a key. Different `tools` or `raw` params also get different keys — Zod tool
+schemas are converted before hashing so equivalent shapes collide correctly.
 
 ### Hits
 
@@ -106,16 +110,26 @@ Prices live in `src/pricing/prices.json` (also exported as `PRICES` / `PRICING`)
 Lookup is by the **model id only** (the part after `provider/`), not the full ref.
 
 ```ts
-import { cost, PRICES } from "llm-sdk";
+import { cost, PRICES } from "llm-sdk-js";
 
 cost({ input: 1000, output: 200 }, "gpt-4o-mini");
 ```
 
-### Unknown models → `$0`
+### Unknown models → `$0`, but not silently
 
-If the model id is missing from the table, `cost` is **`0`**. That is silent. Treat `0` with
-non-zero `usage` as "unpriced," or extend the price table in a fork / local patch until the
-package grows coverage.
+If the model id is missing from the table, `cost` is **`0`** — but `res.unknownModel` is `true`,
+so a typo'd or newly-released model reports as explicitly unpriced rather than looking free.
+`cost()` also logs a one-time `console.warn` the first time it sees an unrecognized model id
+(not repeated on every call for that model). Check `unknownModel` before trusting `cost` in
+anything that sums spend, or extend the price table in a fork / local patch until the package
+grows coverage.
+
+```ts
+import { isKnownModel } from "llm-sdk-js";
+
+isKnownModel("gpt-4o-mini"); // true
+isKnownModel("some-new-model"); // false — cost() would return 0 for it
+```
 
 Cached hits still return the **original** stored `cost` from when the entry was written (they
 do not re-price).

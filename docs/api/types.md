@@ -111,6 +111,7 @@ interface CompleteResult {
   model: string;
   usage: Usage;
   cost: number;
+  unknownModel: boolean; // true if `model` has no price table row — cost is 0, not free
   cached: boolean;
   latencyMs: number;
   attempts: AttemptRecord[];
@@ -124,6 +125,7 @@ interface ExtractResult<T = unknown> {
   model: string;
   usage: Usage;
   cost: number;
+  unknownModel: boolean;
   cached: boolean;
   latencyMs: number;
   attempts: AttemptRecord[];

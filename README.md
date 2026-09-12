@@ -14,17 +14,17 @@
   ·
   <a href="https://llm-sdk.dev/guide/getting-started">Getting started</a>
   ·
-  <a href="https://www.npmjs.com/package/llm-sdk">npm</a>
+  <a href="https://www.npmjs.com/package/llm-sdk-js">npm</a>
 </p>
 
 ---
 
 ```bash
-npm install llm-sdk
+npm install llm-sdk-js
 ```
 
 ```ts
-import { createRouter } from "llm-sdk";
+import { createRouter } from "llm-sdk-js";
 
 const llm = createRouter({
   routes: {

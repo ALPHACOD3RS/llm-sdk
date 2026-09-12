@@ -5,7 +5,7 @@ description: Reference for createRouter(config) and the router it hands back.
 # createRouter
 
 ```ts
-import { createRouter, type Router } from "llm-sdk";
+import { createRouter, type Router } from "llm-sdk-js";
 
 const llm = createRouter({
   primary: "anthropic/claude-sonnet-4-5",
@@ -52,7 +52,8 @@ interface StreamHandle {
 ```
 
 - Real SSE from providers; ~40 character failover buffer.
-- No same-provider retries; tool calls not accumulated on live streams.
+- No same-provider retries; tool calls are accumulated from streamed deltas and surfaced on
+  `result().toolCalls` once the stream completes.
 - Shares cache with `complete()`.
 
 ### `extract(input, options?)`

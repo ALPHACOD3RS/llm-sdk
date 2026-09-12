@@ -11,7 +11,7 @@ library (Valibot, ArkType, …) — with **zero** runtime dependency on those li
 
 ```ts
 import { z } from "zod";
-import { createRouter } from "llm-sdk";
+import { createRouter } from "llm-sdk-js";
 
 const llm = createRouter({
   primary: "openai/gpt-4o-mini",

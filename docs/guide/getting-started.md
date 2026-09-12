@@ -13,19 +13,19 @@ account to create, and no service in the middle that sees your prompts.
 ::: code-group
 
 ```bash [npm]
-npm install llm-sdk
+npm install llm-sdk-js
 ```
 
 ```bash [pnpm]
-pnpm add llm-sdk
+pnpm add llm-sdk-js
 ```
 
 ```bash [yarn]
-yarn add llm-sdk
+yarn add llm-sdk-js
 ```
 
 ```bash [bun]
-bun add llm-sdk
+bun add llm-sdk-js
 ```
 
 :::
@@ -51,7 +51,7 @@ to point a provider at a compatible endpoint — see [Configuration](/guide/conf
 ## Your first call
 
 ```ts [example.ts]
-import { createRouter } from "llm-sdk";
+import { createRouter } from "llm-sdk-js";
 
 const llm = createRouter({
   primary: "anthropic/claude-sonnet-4-5",
@@ -99,6 +99,7 @@ res.provider; // "openai"
 res.model; // "gpt-4o"
 res.usage; // { input: 412, output: 38 }
 res.cost; // 0.0014 — USD, estimated from usage
+res.unknownModel; // false — true (and cost 0) if the model has no price table entry
 res.cached; // false
 res.latencyMs; // 184
 res.toolCalls; // [] unless the model called a tool
@@ -123,7 +124,7 @@ If the chain is exhausted, the call throws `AllProvidersFailed` with the same at
 attached:
 
 ```ts
-import { AllProvidersFailed, BadRequest } from "llm-sdk";
+import { AllProvidersFailed, BadRequest } from "llm-sdk-js";
 
 try {
   await llm.complete(prompt);
@@ -147,7 +148,7 @@ double and register it under any provider name via `adapters`, which makes the f
 something you can actually test:
 
 ```ts [router.test.ts]
-import { createRouter, ProviderError, type Adapter } from "llm-sdk";
+import { createRouter, ProviderError, type Adapter } from "llm-sdk-js";
 
 class FakeAdapter implements Adapter {
   readonly name = "fake";

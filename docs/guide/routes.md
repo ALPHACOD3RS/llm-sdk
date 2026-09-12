@@ -11,7 +11,7 @@ literals and every call site becomes a policy decision. Put them in one place an
 name.
 
 ```ts
-import { createRouter } from "llm-sdk";
+import { createRouter } from "llm-sdk-js";
 
 const llm = createRouter({
   routes: {

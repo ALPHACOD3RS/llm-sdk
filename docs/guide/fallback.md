@@ -136,7 +136,7 @@ hits zero mid-chain, remaining models may be skipped with `error: "timeout"` rec
 ## Catching the outcome
 
 ```ts
-import { AllProvidersFailed, BadRequest } from "llm-sdk";
+import { AllProvidersFailed, BadRequest } from "llm-sdk-js";
 
 try {
   const res = await llm.complete(prompt);

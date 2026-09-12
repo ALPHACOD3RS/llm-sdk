@@ -10,7 +10,7 @@ implement `Adapter`, register it under a name, route `name/model` to it.
 ## Minimal fake
 
 ```ts
-import { createRouter, ProviderError, type Adapter } from "llm-sdk";
+import { createRouter, ProviderError, type Adapter } from "llm-sdk-js";
 
 class FakeAdapter implements Adapter {
   readonly name = "fake";
