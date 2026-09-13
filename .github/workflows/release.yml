@@ -45,4 +45,9 @@ jobs:
           publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Both names matter: NODE_AUTH_TOKEN is what the .npmrc written by
+          # actions/setup-node references; NPM_TOKEN is what npm's own OIDC-fallback
+          # check looks for explicitly — without it, npm tries (and fails) trusted
+          # publishing via the id-token permission instead of using this token.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
