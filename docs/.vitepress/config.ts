@@ -1,13 +1,16 @@
 import { readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { defineConfigWithTheme, type DefaultTheme } from "vitepress";
-import { llmsTxtDevServer, renderLlmsTxt } from "./llms.js";
+import { defineConfigWithTheme, type DefaultTheme, type HeadConfig } from "vitepress";
+import { llmsTxtDevServer, renderLlmsFullTxt, renderLlmsIndex } from "./llms.js";
 import { icons, type IconName } from "./theme/sidebar-icons.js";
 
-const { version } = JSON.parse(
+const { version, description: pkgDescription } = JSON.parse(
   readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
-) as { version: string };
+) as { version: string; description: string };
+
+// Canonical host: the apex domain 308-redirects here, so this is the one true origin.
+const SITE_URL = "https://www.llm-sdk.dev";
 
 function navItem(icon: IconName, text: string, link: string) {
   return { text: `${icons[icon]}<span>${text}</span>`, link };
@@ -27,12 +30,66 @@ export default defineConfigWithTheme<ThemeConfig>({
   lastUpdated: true,
   appearance: "force-dark",
 
+  sitemap: {
+    hostname: SITE_URL,
+  },
+
   vite: {
-    plugins: [llmsTxtDevServer(new URL("..", import.meta.url).pathname)],
+    plugins: [llmsTxtDevServer(new URL("..", import.meta.url).pathname, SITE_URL)],
   },
 
   async buildEnd({ srcDir, outDir }) {
-    await writeFile(join(outDir, "llms.txt"), await renderLlmsTxt(srcDir));
+    await writeFile(join(outDir, "llms.txt"), await renderLlmsIndex(srcDir, SITE_URL));
+    await writeFile(join(outDir, "llms-full.txt"), await renderLlmsFullTxt(srcDir, SITE_URL));
+  },
+
+  transformHead({ page, title, description }) {
+    const head: HeadConfig[] = [];
+    const canonicalPath = page.replace(/(^|\/)index\.md$/, "$1").replace(/\.md$/, "");
+    const url = `${SITE_URL}/${canonicalPath}`.replace(/\/$/, "") || SITE_URL;
+
+    head.push(
+      ["link", { rel: "canonical", href: url }],
+      ["meta", { property: "og:type", content: "website" }],
+      ["meta", { property: "og:site_name", content: "llm-sdk" }],
+      ["meta", { property: "og:title", content: title }],
+      ["meta", { property: "og:description", content: description }],
+      ["meta", { property: "og:url", content: url }],
+      ["meta", { name: "twitter:card", content: "summary" }],
+      ["meta", { name: "twitter:title", content: title }],
+      ["meta", { name: "twitter:description", content: description }],
+    );
+
+    if (canonicalPath === "index" || canonicalPath === "") {
+      head.push([
+        "script",
+        { type: "application/ld+json" },
+        JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              name: "llm-sdk",
+              url: SITE_URL,
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              name: "llm-sdk",
+              alternateName: "llm-sdk-js",
+              description: pkgDescription,
+              codeRepository: "https://github.com/ALPHACOD3RS/llm-sdk",
+              programmingLanguage: "TypeScript",
+              runtimePlatform: "Node.js",
+              license: "https://github.com/ALPHACOD3RS/llm-sdk/blob/main/LICENSE",
+              url: SITE_URL,
+              downloadUrl: "https://www.npmjs.com/package/llm-sdk-js",
+            },
+          ],
+        }),
+      ]);
+    }
+
+    return head;
   },
 
   markdown: {

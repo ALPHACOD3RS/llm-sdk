@@ -1,8 +1,68 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, sep } from "node:path";
 
-/** Build `/llms.txt` from the docs source tree. */
-export async function renderLlmsTxt(srcDir: string, siteUrl = ""): Promise<string> {
+const SUMMARY =
+  "llm-sdk (npm: llm-sdk-js) is an open-source TypeScript router for LLM calls. It runs in your " +
+  "own process — your API keys, direct HTTP calls to providers, zero runtime dependencies, no " +
+  "proxy service in the middle. Given a primary model and a list of fallbacks, it retries and " +
+  "fails over automatically and returns which provider answered, what the call cost, and every " +
+  "attempt on the way. It supports OpenAI, Anthropic, Groq, and local/self-hosted OpenAI-compatible " +
+  "endpoints, plus named routes, response caching, cost tracking, structured output extraction, " +
+  "and tool calling.";
+
+/** Build the short, curated `/llms.txt` index (llmstxt.org convention). */
+export async function renderLlmsIndex(srcDir: string, siteUrl: string): Promise<string> {
+  const files = (await walk(srcDir))
+    .filter((file) => relative(srcDir, file) !== "index.md")
+    .sort(order);
+
+  const entries = await Promise.all(
+    files.map(async (file) => {
+      const raw = await readFile(file, "utf8");
+      const path = relative(srcDir, file).split(sep).join("/");
+      const url = `${siteUrl}/${path.replace(/\.md$/, "")}`;
+      const title = firstHeading(raw) ?? path;
+      const description = frontmatterDescription(raw);
+      return { path, url, title, description };
+    }),
+  );
+
+  const guide = entries.filter((e) => e.path.startsWith("guide/"));
+  const api = entries.filter((e) => e.path.startsWith("api/"));
+
+  const section = (title: string, items: typeof entries) =>
+    items.length === 0
+      ? []
+      : [
+          `## ${title}`,
+          "",
+          ...items.map((e) => `- [${e.title}](${e.url})${e.description ? `: ${e.description}` : ""}`),
+          "",
+        ];
+
+  return [
+    "# llm-sdk",
+    "",
+    `> ${SUMMARY}`,
+    "",
+    "## Start here",
+    "",
+    `- [Getting started](${siteUrl}/guide/getting-started): install, first call, project layout.`,
+    `- [GitHub repository](https://github.com/ALPHACOD3RS/llm-sdk): source, issues, releases.`,
+    `- [npm package](https://www.npmjs.com/package/llm-sdk-js): \`npm install llm-sdk-js\`.`,
+    `- [Full documentation, concatenated](${siteUrl}/llms-full.txt): every guide and API page in one file, for models that read a single document.`,
+    "",
+    ...section("Guide", guide),
+    ...section("API reference", api),
+  ]
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .concat("\n");
+}
+
+/** Build `/llms-full.txt`: the complete docs source, concatenated for language models. */
+export async function renderLlmsFullTxt(srcDir: string, siteUrl: string): Promise<string> {
   const files = (await walk(srcDir))
     .filter((file) => relative(srcDir, file) !== "index.md")
     .sort(order);
@@ -19,11 +79,28 @@ export async function renderLlmsTxt(srcDir: string, siteUrl = ""): Promise<strin
   return [
     "# llm-sdk",
     "",
-    "TypeScript LLM router — automatic fallbacks, named routes, cost tracking, and caching.",
-    "The complete documentation, concatenated for language models.",
+    SUMMARY,
+    "",
+    "The complete documentation, concatenated for language models. See" +
+      ` ${siteUrl}/llms.txt for a shorter, curated index.`,
     "",
     pages.join("\n---\n\n"),
   ].join("\n");
+}
+
+function firstHeading(raw: string): string | undefined {
+  const body = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
+  return /^#\s+(.+)$/m.exec(body)?.[1]?.trim();
+}
+
+function frontmatterDescription(raw: string): string | undefined {
+  const fm = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/.exec(raw)?.[1];
+  if (!fm) return undefined;
+  const match = /^description:\s*([\s\S]*?)(?:\n\w+:|$)/m.exec(fm);
+  return match?.[1]
+    ?.replace(/\r?\n\s*/g, " ")
+    .trim()
+    .replace(/^["']|["']$/g, "");
 }
 
 /** Prefer guide pages, then getting-started. */
@@ -71,18 +148,26 @@ interface MiddlewareServer {
   };
 }
 
-/** Serve `/llms.txt` during `vitepress dev`. */
-export function llmsTxtDevServer(srcDir: string) {
+/** Serve `/llms.txt` and `/llms-full.txt` during `vitepress dev`. */
+export function llmsTxtDevServer(srcDir: string, siteUrl: string) {
   return {
     name: "llm-sdk:llms-txt",
     apply: "serve" as const,
     configureServer(server: MiddlewareServer) {
       server.middlewares.use((req, res, next) => {
-        if (req.url !== "/llms.txt") return next();
-        renderLlmsTxt(srcDir).then((body) => {
-          res.setHeader("Content-Type", "text/plain; charset=utf-8");
-          res.end(body);
-        }, next);
+        if (req.url === "/llms.txt") {
+          renderLlmsIndex(srcDir, siteUrl).then((body) => {
+            res.setHeader("Content-Type", "text/plain; charset=utf-8");
+            res.end(body);
+          }, next);
+        } else if (req.url === "/llms-full.txt") {
+          renderLlmsFullTxt(srcDir, siteUrl).then((body) => {
+            res.setHeader("Content-Type", "text/plain; charset=utf-8");
+            res.end(body);
+          }, next);
+        } else {
+          next();
+        }
       });
     },
   };
