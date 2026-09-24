@@ -1,6 +1,7 @@
 import DefaultTheme from "vitepress/theme";
 import type { Theme } from "vitepress";
 import { h } from "vue";
+import { inject } from "@vercel/analytics";
 import "./style.css";
 import AsideMeta from "./AsideMeta.vue";
 import DocChrome from "./DocChrome.vue";
@@ -10,6 +11,9 @@ import SidebarHead from "./SidebarHead.vue";
 
 export default {
   extends: DefaultTheme,
+  enhanceApp() {
+    if (!import.meta.env.SSR) inject();
+  },
   Layout: () =>
     h(DefaultTheme.Layout, null, {
       "layout-top": () => h(DocChrome),
