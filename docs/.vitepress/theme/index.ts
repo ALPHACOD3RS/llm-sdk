@@ -12,7 +12,11 @@ import SidebarHead from "./SidebarHead.vue";
 export default {
   extends: DefaultTheme,
   enhanceApp() {
-    if (!import.meta.env.SSR) inject();
+    if (!import.meta.env.SSR) {
+      inject({
+        mode: import.meta.env.DEV ? 'development' : 'production',
+      });
+    }
   },
   Layout: () =>
     h(DefaultTheme.Layout, null, {
