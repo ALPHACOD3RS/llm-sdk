@@ -62,6 +62,13 @@ export default defineConfigWithTheme<ThemeConfig>({
 
     if (canonicalPath === "index" || canonicalPath === "") {
       head.push([
+        "link",
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap",
+        },
+      ]);
+      head.push([
         "script",
         { type: "application/ld+json" },
         JSON.stringify({
